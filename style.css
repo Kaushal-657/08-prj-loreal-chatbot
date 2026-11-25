@@ -100,6 +100,17 @@ body {
   border-left: 4px solid var(--loreal-gold);
 }
 
+/* latest question: shown just above the newest AI reply */
+.latest-question {
+  align-self: flex-start;
+  max-width: 80%;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--loreal-gray);
+  overflow-wrap: anywhere; /* wraps very long words */
+}
+
 /* —— input row —— */
 .chat-form {
   display: flex;

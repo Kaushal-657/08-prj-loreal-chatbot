@@ -8,6 +8,11 @@ const userInput = document.getElementById("userInput");
 const chatWindow = document.getElementById("chatWindow");
 const sendBtn = document.getElementById("sendBtn");
 
+/* One line that shows the user's latest question.
+   We only make it once, then reuse it for every new question. */
+const latestQuestion = document.createElement("div");
+latestQuestion.classList.add("latest-question");
+
 /* Our Cloudflare Worker URL.
    The Worker holds the OpenAI API key safely, so we never put a key here. */
 const workerUrl = "https://mute-river-9f61.tamangkaushal87.workers.dev/";
@@ -22,6 +27,8 @@ Only help with:
 - Beauty routines and personalized product recommendations
 
 If a question is not about L'Oréal or beauty, politely say you can only help with L'Oréal products, routines, and beauty advice, then invite the user to ask a beauty question.
+
+Remember details the user shares, like their name, skin type, and past questions. Use them in your replies, and answer if the user asks about them.
 
 Keep answers short, warm, and easy to read. Do not give medical diagnoses; suggest seeing a dermatologist for serious skin concerns.`;
 
@@ -50,7 +57,7 @@ function addMessage(sender, text) {
 /* Show a welcome message when the page loads */
 addMessage(
   "ai",
-  "👋 Hello! I'm your L'Oréal Smart Product Advisor. Ask me about makeup, skincare, haircare, fragrance, or a routine made just for you!",
+  "Hello! I'm your L'Oréal Smart Product Advisor. Ask me about makeup, skincare, haircare, fragrance, or a routine made just for you!",
 );
 
 /* Handle form submit (when the user presses Enter or clicks Send) */
@@ -68,6 +75,12 @@ chatForm.addEventListener("submit", async (e) => {
 
   // Save the user's message in the conversation history
   messages.push({ role: "user", content: question });
+
+  // Replace the old question with the new one (this is the "reset")
+  latestQuestion.textContent = `You asked: ${question}`;
+
+  // Move the line to the bottom of the chat, so the reply appears just below it
+  chatWindow.appendChild(latestQuestion);
 
   // Show a temporary "thinking" message and disable the button
   const thinkingDiv = addMessage("ai", "Thinking…");
@@ -111,6 +124,8 @@ chatForm.addEventListener("submit", async (e) => {
     // Turn the send button back on and put the cursor back in the input
     sendBtn.disabled = false;
     userInput.focus();
-    chatWindow.scrollTop = chatWindow.scrollHeight;
+
+    // Scroll to the latest question so it stays visible above a long reply
+    chatWindow.scrollTop = latestQuestion.offsetTop - chatWindow.offsetTop;
   }
 });
